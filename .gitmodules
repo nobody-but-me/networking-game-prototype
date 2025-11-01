@@ -1,0 +1,3 @@
+[submodule "core/libs/glm"]
+	path = core/libs/glm
+	url = https://github.com/icaven/glm.git

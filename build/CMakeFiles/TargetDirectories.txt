@@ -1,0 +1,3 @@
+/home/danny/Documents/_hobbies/_programming/_cpp/movie/build/CMakeFiles/prototype.dir
+/home/danny/Documents/_hobbies/_programming/_cpp/movie/build/CMakeFiles/edit_cache.dir
+/home/danny/Documents/_hobbies/_programming/_cpp/movie/build/CMakeFiles/rebuild_cache.dir
