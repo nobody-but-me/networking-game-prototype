@@ -3,7 +3,7 @@
 #ifndef APPLICATION_HPP
 #define APPLICATION_HPP
 
-#include <glm/vec2.hpp>
+#include <>
 
 namespace Application
 {
@@ -11,8 +11,8 @@ namespace Application
 	void add_puppet(int id);
 	void add_player();
 	
-	void update_puppet_position(glm::vec2 new_position);
-	void update_player_position(glm::vec2 new_position);
+	void update_puppet_position(int id);
+	void update_player_position();
 	
     void process(double delta);
     void ready();

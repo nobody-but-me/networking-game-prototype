@@ -54,7 +54,7 @@ namespace BackEnd
 #else
 		if (Networking::init_client() == 0) {
 			Application::add_player();
-			Application::add_puppet();
+			Application::add_puppet(1);
 		}
 #endif
 		
@@ -77,15 +77,29 @@ namespace BackEnd
 		GlfwIntegration::end_frame();
     }
 
-	static void server_connected_callback(int id) { Application::add_puppet(); }
-	static void client_connected_callback(int id) { Application::add_puppet(); }
+	static void receive_callback(void *packet, int id) { 
+		if (packet != NULL) {
+			glm::vec2 *new_position = (glm::vec2*)packet;
+			
+			Logging::INFO("x: %.1", new_position->x);
+			Logging::INFO("y: %.1", new_position->y);
+			
+			Application::update_puppet_position(*new_position);
+		} else
+			Logging::ERROR("backend.cpp::receive_callback(void*,int) : Received packet is NULL.");
+		return;
+	}
+	static void connected_callback(int id) {
+		Application::add_puppet(id);
+		return;
+	}
 	
     void loop() {
 #if SERVER == 0
-		Networking::server_loop(server_connected_callback, NULL, NULL);
+		Networking::server_loop(connected_callback, NULL, NULL);
 #else
-		Networking::client_loop(client_connected_callback, NULL, NULL);
-#endif		
+		Networking::client_loop(NULL, receive_callback, NULL);
+#endif
 		begin_frame();
 		if (InputManager::is_key_pressed(KEY_ESC)) force_window_close();
 		

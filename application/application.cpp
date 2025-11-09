@@ -12,6 +12,8 @@
 #include <common/object.hpp>
 #include <utils/input.hpp>
 
+#include <networking/networking.h>
+
 namespace Application {
     
 //    Object sprite, sprite2, offset;
@@ -29,9 +31,11 @@ namespace Application {
 		player.position = glm::vec2(0.0f, 0.0f);
 		player.scale = glm::vec2(5.0f, 5.0f);
 		player.z_index = 10;
+		
+		player.set_id(0);
 		return;
 	}
-	void add_puppet() {
+	void add_puppet(int id) {
 		ResourceManager::init_rectangle(&puppet, "puppet", nullptr);
 		puppet.colour = glm::vec4(0.0f, 0.0f, 255.0f, 255.0f);
 		puppet.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -39,15 +43,36 @@ namespace Application {
 		puppet.scale = glm::vec2(0.0f, 0.0f);
 		puppet.scale = glm::vec2(5.0f, 5.0f);
 		puppet.z_index = 0;
+		
+		puppet.set_id(id);
 		return;
 	}
-	    
-    void process(double delta) {
+	
+	void update_puppet_position(glm::vec2 new_position) {
+		puppet.position = new_position;
+		return;
+	}
+	void update_player_position(glm::vec2 new_position) {
+		player.position = new_position;
+		return;
+	}
+	   
+	void process(double delta) {
+		// NOTE: this is going to update the puppet poisition of the connected instance, not the current one
+		if (player.get_initialized() == true) {
+			if (InputManager::is_key_pressed(KEY_D)) {
+				player.position.x += speed * delta;
+				Networking::send_puppet_position(player.position);
+			}
+			if (InputManager::is_key_pressed(KEY_A)) {
+				player.position.x -= speed * delta;
+				Networking::send_puppet_position(player.position);
+			}
+		}
+		
 //		sprite2.position.x += speed * delta;
-		player.position.x += speed * delta;
 //		offset.position = sprite2.position;
 //		if (sprite2.position.x >= 12.0f) sprite2.position.x = -10.0f;
-		if (player.position.x >= 12.0f) player.position.x = -10.0f;
 //		if (Physics::is_rect_colliding(&sprite2, &sprite)) sprite2.colour = glm::vec4(255.0f, 0.0f  , 0.0f  , 255.0f);
 //		else                                               sprite2.colour = glm::vec4(255.0f, 255.0f, 255.0f, 255.0f);	
 //		return;

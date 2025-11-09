@@ -2,6 +2,8 @@
 #include <iostream>
 #include <string>
 
+#include <glm/vec2.hpp>
+
 #include <networking/networking.h>
 #include <utils/log.hpp>
 #include <enet/enet.h>
@@ -10,13 +12,16 @@
 
 namespace Networking
 {
-	void send_string(const char *string, size_t length, ENetPeer *to) {
-		ENetPacket *packet = enet_packet_create(string, length, ENET_PACKET_FLAG_RELIABLE);
-		enet_peer_send(to, 0, packet);
-		return;
-	}	
+	
 	ENetHost *sserver = NULL;
 	ENetPeer *sclient = NULL;
+	
+	void send_puppet_position(glm::vec2 new_position) {
+		if (sclient != NULL) {
+			send_packet(sclient, &new_position, sizeof(new_position), true);
+		}
+		return;
+	}
 	
 	int init_server() {
 		ENetAddress address = {};
@@ -45,7 +50,8 @@ namespace Networking
 					sclient = event.peer;					
 					if (sclient) {
 						std::string message = "Hello, client.";
-						send_string(message.c_str(), message.size() + 1 , sclient);
+//						send_string(message.c_str(), message.size() + 1 , sclient);
+						send_string(sclient, message.c_str(), message.size() + 1, true);
 					}
 					if (connect_callback != NULL)
 						connect_callback(event.peer->incomingPeerID);
