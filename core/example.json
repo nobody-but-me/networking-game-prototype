@@ -1,0 +1,11 @@
+{
+	"name": "Joe",
+	"age": 999,
+	"hobbies": ["coding", "coding", "coding"],
+	"todo": {
+		"wash the dishes": true,
+		"code": true,
+		"commit something to github": false,
+		"read something": false,
+	},
+}

@@ -14,7 +14,7 @@ namespace Networking
 	
 	void send_puppet_position(glm::vec2 new_position); // that's kinda bad
 	
-	void send_string(ENetPeer *to, const char *string_data, size_t packet_size, bool reliable);
+	void send_packet(ENetPeer *to, const char *string_data, size_t packet_size, bool reliable);
 	void send_packet(ENetPeer *to, void *data, size_t packet_size, bool reliable);
 	
 	void server_loop(void (*connect_callback)(int), void (*receive_callback)(void*, int), void(*disconnect_callback)(int));

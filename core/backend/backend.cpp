@@ -23,21 +23,22 @@
 #include <application.hpp>
 
 #define SHADER_PATH "../../core/res/shaders/"
-#define SERVER 1
+int SERVER = 0;
 
 namespace BackEnd
 {
     
     Shader main_shader;
-    
+ 	
+	void set_server(int server) { SERVER = server; }
+	
     void force_window_close( ) { GlfwIntegration::force_window_close(); }
     void destroy_application() {
 		Logging::INFO("backend.cpp::destroy_application() : Destroying application...");
-#if SERVER == 0
-		Networking::destroy_server();
-#else
-		Networking::destroy_client();
-#endif
+		if (SERVER == 0)
+			Networking::destroy_server();
+		else
+			Networking::destroy_client();
 		
 		Editor::destroy();
 		GlfwIntegration::destroy();
@@ -48,15 +49,16 @@ namespace BackEnd
     
     int init(const WindowMode& window_mode) {
 		if (GlfwIntegration::init(window_mode) == -1) return -1;
-#if SERVER == 0
-		if (Networking::init_server() == 0)
-			Application::add_player();
-#else
-		if (Networking::init_client() == 0) {
-			Application::add_player();
-			Application::add_puppet(1);
+		if (SERVER == 0) {
+			if (Networking::init_server() == 0)
+				Application::add_player();
 		}
-#endif
+		else {
+			if (Networking::init_client() == 0) {
+				Application::add_player();
+				Application::add_puppet(1);
+			}
+		}
 		
 		ResourceManager::load_shader(&main_shader, "main_shader", SHADER_PATH"object.vert", SHADER_PATH"object.frag");
 	
@@ -95,11 +97,11 @@ namespace BackEnd
 	}
 	
     void loop() {
-#if SERVER == 0
-		Networking::server_loop(connected_callback, NULL, NULL);
-#else
-		Networking::client_loop(NULL, receive_callback, NULL);
-#endif
+		if (SERVER == 0)
+			Networking::server_loop(connected_callback, NULL, NULL);
+		else
+			Networking::client_loop(NULL, receive_callback, NULL);
+		
 		begin_frame();
 		if (InputManager::is_key_pressed(KEY_ESC)) force_window_close();
 		

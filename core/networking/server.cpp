@@ -17,9 +17,9 @@ namespace Networking
 	ENetPeer *sclient = NULL;
 	
 	void send_puppet_position(glm::vec2 new_position) {
-		if (sclient != NULL) {
-			send_packet(sclient, &new_position, sizeof(new_position), true);
-		}
+		if (sclient == NULL)
+			return;
+		send_packet(sclient, &new_position, sizeof(new_position) * sizeof(float), true);
 		return;
 	}
 	
@@ -50,8 +50,7 @@ namespace Networking
 					sclient = event.peer;					
 					if (sclient) {
 						std::string message = "Hello, client.";
-//						send_string(message.c_str(), message.size() + 1 , sclient);
-						send_string(sclient, message.c_str(), message.size() + 1, true);
+						send_packet(sclient, message.c_str(), message.size() + 1, true);
 					}
 					if (connect_callback != NULL)
 						connect_callback(event.peer->incomingPeerID);

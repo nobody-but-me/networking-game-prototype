@@ -8,6 +8,8 @@
 namespace BackEnd
 {
     
+	void set_server(int server);
+
     void force_window_close( );
     void destroy_application();
     

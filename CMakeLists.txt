@@ -38,7 +38,12 @@ endif()
 
 find_package(OpenGL REQUIRED)
 
-target_sources(prototype PRIVATE ${CMAKE_SOURCE_DIR}/core/main.cpp ${SRC_FILES} ${CMAKE_SOURCE_DIR}/core/libs/glad.c)
+target_sources(prototype PRIVATE 
+	${CMAKE_SOURCE_DIR}/core/main.cpp 
+	${SRC_FILES} 
+	${CMAKE_SOURCE_DIR}/core/libs/glad.c
+	${CMAKE_SOURCE_DIR}/core/libs/cJSON.c
+)
 target_link_libraries(prototype PRIVATE ${OPENGL_gl_LIBRARY} glfw enet)
 
 target_compile_options(prototype PRIVATE -Wall -Werror -Wno-unused-result -Wno-unknown-pragmas -Wno-unused-function)
