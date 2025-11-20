@@ -15,7 +15,7 @@ namespace Application
 	void update_player_position(glm::vec2 new_position);
 	
     void process(double delta);
-    void ready();
+    void ready(int _SERVER);
     
 }
 

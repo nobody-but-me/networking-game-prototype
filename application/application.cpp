@@ -18,11 +18,17 @@ namespace Application {
     
 //    Object sprite, sprite2, offset;
 //    Texture texture;
+	int SERVER = 0;
 	
 	Object player, puppet;
 	int player_id;
     
     float speed = 4.0f;
+	
+	void update_puppet_position(glm::vec2 new_position) {
+		puppet.position = new_position;
+		return;
+	}
 	
 	void add_player() {
 		ResourceManager::init_rectangle(&player, "player", nullptr);
@@ -47,26 +53,19 @@ namespace Application {
 		puppet.set_id(id);
 		return;
 	}
-	
-	void update_puppet_position(glm::vec2 new_position) {
-		puppet.position = new_position;
-		return;
-	}
-	void update_player_position(glm::vec2 new_position) {
-		player.position = new_position;
-		return;
-	}
 	   
 	void process(double delta) {
 		// NOTE: this is going to update the puppet poisition of the connected instance, not the current one
 		if (player.get_initialized() == true) {
 			if (InputManager::is_key_pressed(KEY_D)) {
 				player.position.x += speed * delta;
-				Networking::send_puppet_position(player.position);
+if (SERVER != 0)
+				Networking::send_player_position_to_server(player.position);
 			}
 			if (InputManager::is_key_pressed(KEY_A)) {
 				player.position.x -= speed * delta;
-				Networking::send_puppet_position(player.position);
+if (SERVER != 0)
+				Networking::send_player_position_to_server(player.position);
 			}
 		}
 		
@@ -77,7 +76,8 @@ namespace Application {
 //		else                                               sprite2.colour = glm::vec4(255.0f, 255.0f, 255.0f, 255.0f);	
 //		return;
     }
-    void ready() {
+    void ready(int _SERVER) {
+		SERVER = _SERVER;
 		
 //		ResourceManager::load_texture(&texture, "mir", "../../application/res/sprites/sprite_sheet.png", true);
 		

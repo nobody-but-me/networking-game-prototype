@@ -1,11 +1,15 @@
 
 
 #include <iostream>
+#include <cstring>
 #include <string>
 
 #include <networking/networking.h>
 #include <utils/log.hpp>
 #include <enet/enet.h>
+
+#include <glm/vec2.hpp>
+#include <libs/cJSON.h>
 
 #define LOG_PREFIX "client.cpp::client() : "
 
@@ -13,6 +17,49 @@ namespace Networking
 {
 	ENetHost *cclient = NULL;
 	ENetPeer *cserver = NULL;
+	
+	void send_player_position_to_server(glm::vec2 player_position) {
+//		TODO: better error messages.
+		if (cserver == NULL) {
+			Logging::WARNING("server's null");
+			return;
+		}
+		cJSON *x_position = NULL;
+		cJSON *y_position = NULL;
+		
+		cJSON *new_player_information = cJSON_CreateObject();
+		if (new_player_information == NULL) {
+			Logging::ERROR("new player information json could not be created");
+			cJSON_Delete(new_player_information);
+			return;
+		}
+		x_position = cJSON_CreateNumber(player_position.x);
+		if (x_position == NULL) {
+			Logging::ERROR("failed to create x position for JSON member");
+			cJSON_Delete(new_player_information);
+			return;
+		}
+		cJSON_AddItemToObject(new_player_information, "x", x_position);
+		
+		y_position = cJSON_CreateNumber(player_position.y);
+		if (y_position == NULL) {
+			Logging::ERROR("failed to create y position for JSON member");
+			cJSON_Delete(new_player_information);
+			return;
+		}
+		cJSON_AddItemToObject(new_player_information, "y", y_position);
+		
+		char *packet = NULL;
+		packet = cJSON_Print(new_player_information);
+		if (packet == NULL) {
+			Logging::ERROR("failed to print JSON to string");
+			cJSON_Delete(new_player_information);
+			return;
+		}
+		send_packet(cserver, packet, strlen(packet), false);
+		Logging::INFO("packet containing new player position had been sent to server.");
+		return;
+	}
 	
 	int init_client() {
 		ENetAddress address = {};
@@ -46,12 +93,12 @@ namespace Networking
 			ENetEvent event;
 			if (enet_host_service(cclient, &event, 10) > 0) {
 				switch (event.type) {
+					case ENET_EVENT_TYPE_NONE:
+						break;
 					case ENET_EVENT_TYPE_CONNECT:
 						if (connect_callback != NULL)
 							connect_callback(event.peer->incomingPeerID);
 						break;
-					case ENET_EVENT_TYPE_NONE: break;
-					
 					case ENET_EVENT_TYPE_RECEIVE:
 						Logging::INFO(LOG_PREFIX"A packet of length %u containing '%s' have been received on channel %u.", 
 														event.packet->dataLength, 

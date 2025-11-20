@@ -16,13 +16,6 @@ namespace Networking
 	ENetHost *sserver = NULL;
 	ENetPeer *sclient = NULL;
 	
-	void send_puppet_position(glm::vec2 new_position) {
-		if (sclient == NULL)
-			return;
-		send_packet(sclient, &new_position, sizeof(new_position) * sizeof(float), true);
-		return;
-	}
-	
 	int init_server() {
 		ENetAddress address = {};
 		if (enet_initialize() != 0) {

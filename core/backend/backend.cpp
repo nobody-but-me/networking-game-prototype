@@ -22,6 +22,8 @@
 #include <utils/input.hpp>
 #include <application.hpp>
 
+#include <libs/cJSON.h>
+
 #define SHADER_PATH "../../core/res/shaders/"
 int SERVER = 0;
 
@@ -52,19 +54,22 @@ namespace BackEnd
 		if (SERVER == 0) {
 			if (Networking::init_server() == 0)
 				Application::add_player();
+			else
+				return -1;
 		}
 		else {
 			if (Networking::init_client() == 0) {
 				Application::add_player();
 				Application::add_puppet(1);
-			}
+			} else
+				return -1;
 		}
 		
 		ResourceManager::load_shader(&main_shader, "main_shader", SHADER_PATH"object.vert", SHADER_PATH"object.frag");
 	
 		Gfx::Renderer::init();
 		InputManager::init(GlfwIntegration::get_current_window());
-		Application::ready();
+		Application::ready(SERVER);
 		
 		Editor::init(GlfwIntegration::get_current_window());
 		Logging::INFO("backend.cpp::init() : backend initialized successfully.");
@@ -79,16 +84,34 @@ namespace BackEnd
 		GlfwIntegration::end_frame();
     }
 
-	static void receive_callback(void *packet, int id) { 
+	static void receive_callback(void *packet, int id) {
+//		NOTE: temporary logic to update puppet position
 		if (packet != NULL) {
-			glm::vec2 *new_position = (glm::vec2*)packet;
-			
-			Logging::INFO("x: %.1", new_position->x);
-			Logging::INFO("y: %.1", new_position->y);
-			
-			Application::update_puppet_position(*new_position);
-		} else
-			Logging::ERROR("backend.cpp::receive_callback(void*,int) : Received packet is NULL.");
+			cJSON *pkt = cJSON_Parse((char*)packet);
+			if (pkt == NULL) {
+				Logging::ERROR("json packet could not be parsed.");
+				return;
+			}
+			cJSON *x_position = NULL; cJSON *y_position = NULL;
+			x_position = cJSON_GetObjectItemCaseSensitive(pkt, "x");
+			if (x_position == NULL) {
+				Logging::ERROR("could not get X position object item.");
+				return;
+			}
+			y_position = cJSON_GetObjectItemCaseSensitive(pkt, "y");
+			if (y_position == NULL){
+				Logging::ERROR("could not get Y position object item.");
+				return;
+			}
+			if (!cJSON_IsNumber(x_position) || !cJSON_IsNumber(y_position)) {
+				Logging::ERROR("x or y position object item is not number.");
+				return;
+			}
+			glm::vec2 new_puppet_position;
+			new_puppet_position.x = x_position->valuedouble;
+			new_puppet_position.y = y_position->valuedouble;
+			Application::update_puppet_position(new_puppet_position);
+		}
 		return;
 	}
 	static void connected_callback(int id) {
@@ -98,9 +121,9 @@ namespace BackEnd
 	
     void loop() {
 		if (SERVER == 0)
-			Networking::server_loop(connected_callback, NULL, NULL);
+			Networking::server_loop(connected_callback, receive_callback, NULL);
 		else
-			Networking::client_loop(NULL, receive_callback, NULL);
+			Networking::client_loop(NULL, NULL, NULL);
 		
 		begin_frame();
 		if (InputManager::is_key_pressed(KEY_ESC)) force_window_close();
