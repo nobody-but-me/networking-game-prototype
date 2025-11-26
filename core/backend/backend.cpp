@@ -22,8 +22,6 @@
 #include <utils/input.hpp>
 #include <application.hpp>
 
-#include <libs/cJSON.h>
-
 #define SHADER_PATH "../../core/res/shaders/"
 int SERVER = 0;
 
@@ -83,45 +81,23 @@ namespace BackEnd
     void end_frame() {
 		GlfwIntegration::end_frame();
     }
-
-	static void receive_callback(void *packet, int id) {
-//		NOTE: temporary logic to update puppet position
-		if (packet != NULL) {
-			cJSON *pkt = cJSON_Parse((char*)packet);
-			if (pkt == NULL) {
-				Logging::ERROR("json packet could not be parsed.");
-				return;
-			}
-			cJSON *x_position = NULL; cJSON *y_position = NULL;
-			x_position = cJSON_GetObjectItemCaseSensitive(pkt, "x");
-			if (x_position == NULL) {
-				Logging::ERROR("could not get X position object item.");
-				return;
-			}
-			y_position = cJSON_GetObjectItemCaseSensitive(pkt, "y");
-			if (y_position == NULL){
-				Logging::ERROR("could not get Y position object item.");
-				return;
-			}
-			if (!cJSON_IsNumber(x_position) || !cJSON_IsNumber(y_position)) {
-				Logging::ERROR("x or y position object item is not number.");
-				return;
-			}
-			glm::vec2 new_puppet_position;
-			new_puppet_position.x = x_position->valuedouble;
-			new_puppet_position.y = y_position->valuedouble;
-			Application::update_puppet_position(new_puppet_position);
-		}
-		return;
-	}
+	
 	static void connected_callback(int id) {
 		Application::add_puppet(id);
 		return;
 	}
-	
+	static void received_callback(void *packet, int id) {
+// TODO: reinterpreting directly to vec2_packet -- TEMPORARY; check type of packet before
+// and reinterpret it to type in question;
+		const Networking::vec2_packet_t *pkt = reinterpret_cast<const Networking::vec2_packet_t*>(packet);
+		if (pkt == NULL)
+			return;
+		Application::update_puppet_position(glm::vec2(pkt->x, pkt->y));
+		return;
+	}
     void loop() {
 		if (SERVER == 0)
-			Networking::server_loop(connected_callback, receive_callback, NULL);
+			Networking::server_loop(connected_callback, received_callback, NULL);
 		else
 			Networking::client_loop(NULL, NULL, NULL);
 		

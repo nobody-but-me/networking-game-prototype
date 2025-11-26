@@ -36,28 +36,36 @@ namespace Networking
 	
 	void server_loop(void (*connect_callback)(int id), void (*receive_callback)(void *data,int id), void (*disconnect_callback)(int id)) {
 		ENetEvent event = {};
-		if (enet_host_service(sserver, &event, 10) > 0) {
+		if (enet_host_service(sserver, &event, 0) > 0) {
 			switch (event.type) {
-				case ENET_EVENT_TYPE_CONNECT:
+				case ENET_EVENT_TYPE_CONNECT: {
 					Logging::INFO(LOG_PREFIX"New client connected from %d:%u.", event.peer->address.host, event.peer->address.port);
-					sclient = event.peer;					
-					if (sclient) {
-						std::string message = "Hello, client.";
-						send_packet(sclient, message.c_str(), message.size() + 1, true);
-					}
+//					sclient = event.peer;					
+//					if (sclient) {
+//						std::string message = "Hello, client.";
+//						send_packet(sclient, message.c_str(), message.size() + 1, true);
+//					}
 					if (connect_callback != NULL)
 						connect_callback(event.peer->incomingPeerID);
 					break;
-				case ENET_EVENT_TYPE_RECEIVE:
-					Logging::INFO(LOG_PREFIX"A packet of length %u containg '%s' have been received on channel %u.", 
-																		event.packet->dataLength, 
-																		event.packet->data, 
-																		event.channelID
-					);
+				}
+				case ENET_EVENT_TYPE_RECEIVE: {
+//					Logging::INFO(LOG_PREFIX"A packet of length %u containg '%s' have been received on channel %u.", 
+//																		event.packet->dataLength, 
+//																		event.packet->data, 
+//																		event.channelID
+//					);
+//					const packet_t *received_packet = reinterpret_cast<const packet_t*>(event.packet->data);
+//					if (received_packet == NULL)
+//						break;
+//					if (received_packet->type == Networking::packet_types::double_packet)
+//						Logging::INFO(LOG_PREFIX"double: %.1f", received_packet->double_value);
+					
 					if (receive_callback != NULL)
 						receive_callback(event.packet->data, event.peer->incomingPeerID);
 					enet_packet_destroy(event.packet);
 					break;
+				}
 				case ENET_EVENT_TYPE_DISCONNECT:
 					Logging::INFO(LOG_PREFIX"Client disconnected");
 					sclient = 0;
@@ -65,7 +73,9 @@ namespace Networking
 						disconnect_callback(event.peer->incomingPeerID);
 					break;
 				case ENET_EVENT_TYPE_NONE:
+				default:
 					break;
+
 			}
 		}
 		return;

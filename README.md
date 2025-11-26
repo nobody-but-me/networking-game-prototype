@@ -43,7 +43,7 @@ And follow the instructions.
     - [x] Input handler;
     - [ ] Scene manager;
          - [ ] Read and parse custom format and data files;
-	 - [ ] .
+	     - [ ] .
     - [ ] Object selecting and moving;
     - [ ] Load levels/maps from format data files;
     - [ ] Level/map editor;

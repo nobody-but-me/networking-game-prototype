@@ -11,6 +11,7 @@
 #include <physics/collision.hpp>
 #include <common/object.hpp>
 #include <utils/input.hpp>
+#include <math/lerp.hpp>
 
 #include <networking/networking.h>
 
@@ -26,7 +27,9 @@ namespace Application {
     float speed = 4.0f;
 	
 	void update_puppet_position(glm::vec2 new_position) {
-		puppet.position = new_position;
+		puppet.position.x = Math::lerp(puppet.position.x, new_position.x, 0.3f);
+		puppet.position.y = Math::lerp(puppet.position.y, new_position.y, 0.3f);
+//		puppet.position = new_position;
 		return;
 	}
 	
@@ -35,7 +38,7 @@ namespace Application {
 		player.colour = glm::vec4(255.0f, 0.0f, 0.0f, 255.0f);
 		player.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 		player.position = glm::vec2(0.0f, 0.0f);
-		player.scale = glm::vec2(5.0f, 5.0f);
+		player.scale = glm::vec2(2.0f, 2.0f);
 		player.z_index = 10;
 		
 		player.set_id(0);
@@ -47,7 +50,7 @@ namespace Application {
 		puppet.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 		puppet.position = glm::vec2(0.0f, 0.0f);
 		puppet.scale = glm::vec2(0.0f, 0.0f);
-		puppet.scale = glm::vec2(5.0f, 5.0f);
+		puppet.scale = glm::vec2(2.0f, 2.0f);
 		puppet.z_index = 0;
 		
 		puppet.set_id(id);
@@ -60,12 +63,26 @@ namespace Application {
 			if (InputManager::is_key_pressed(KEY_D)) {
 				player.position.x += speed * delta;
 if (SERVER != 0)
-				Networking::send_player_position_to_server(player.position);
+//				Networking::send_player_position_to_server(player.position);
+				Networking::send_vec2(player.position.x, player.position.y);
 			}
 			if (InputManager::is_key_pressed(KEY_A)) {
 				player.position.x -= speed * delta;
 if (SERVER != 0)
-				Networking::send_player_position_to_server(player.position);
+//				Networking::send_player_position_to_server(player.position);
+				Networking::send_vec2(player.position.x, player.position.y);
+			}
+			if (InputManager::is_key_pressed(KEY_S)) {
+				player.position.y -= speed * delta;
+if (SERVER != 0)
+//				Networking::send_player_position_to_server(player.position);
+				Networking::send_vec2(player.position.x, player.position.y);
+			}
+			if (InputManager::is_key_pressed(KEY_W)) {
+				player.position.y += speed * delta;
+if (SERVER != 0)
+//				Networking::send_player_position_to_server(player.position);
+				Networking::send_vec2(player.position.x, player.position.y);
 			}
 		}
 		
