@@ -56,36 +56,42 @@ namespace Application {
 		puppet.set_id(id);
 		return;
 	}
-	   
+	
+	int delay = 0;
 	void process(double delta) {
 		// NOTE: this is going to update the puppet poisition of the connected instance, not the current one
 		if (player.get_initialized() == true) {
 			if (InputManager::is_key_pressed(KEY_D)) {
 				player.position.x += speed * delta;
-if (SERVER != 0)
+//if (SERVER != 0)
 //				Networking::send_player_position_to_server(player.position);
-				Networking::send_vec2(player.position.x, player.position.y);
+//				Networking::send_vec2(player.position.x, player.position.y);
 			}
 			if (InputManager::is_key_pressed(KEY_A)) {
 				player.position.x -= speed * delta;
-if (SERVER != 0)
+//if (SERVER != 0)
 //				Networking::send_player_position_to_server(player.position);
-				Networking::send_vec2(player.position.x, player.position.y);
+//				Networking::send_vec2(player.position.x, player.position.y);
 			}
 			if (InputManager::is_key_pressed(KEY_S)) {
 				player.position.y -= speed * delta;
-if (SERVER != 0)
+//if (SERVER != 0)
 //				Networking::send_player_position_to_server(player.position);
-				Networking::send_vec2(player.position.x, player.position.y);
+//				Networking::send_vec2(player.position.x, player.position.y);
 			}
 			if (InputManager::is_key_pressed(KEY_W)) {
 				player.position.y += speed * delta;
-if (SERVER != 0)
+//if (SERVER != 0)
 //				Networking::send_player_position_to_server(player.position);
+//				Networking::send_vec2(player.position.x, player.position.y);
+			}
+			if (delay < 50)
+				delay++;
+			else {
 				Networking::send_vec2(player.position.x, player.position.y);
+				delay = 0;
 			}
 		}
-		
 //		sprite2.position.x += speed * delta;
 //		offset.position = sprite2.position;
 //		if (sprite2.position.x >= 12.0f) sprite2.position.x = -10.0f;

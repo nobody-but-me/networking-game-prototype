@@ -3,7 +3,7 @@
 
 # if [ "$(type -t ./build/bin/mol)" = "file" ]; then
 if [ -f ./build/bin/prototype ]; then
-    echo "[INFO]: RUNNING...\n"
+    echo "[INFO]: running...\n"
     
     cd ./build/bin/
     
@@ -11,5 +11,5 @@ if [ -f ./build/bin/prototype ]; then
     
     cd ..
 else
-    echo "[ERROR]: COULD NOT RUN ENGINE: EXECUTABLE DOES NOT EXIST OR HAS SOME ERROR. \n"
+    echo "[ERROR]: could not run engine: executable does not exist or has some error. \n"
 fi

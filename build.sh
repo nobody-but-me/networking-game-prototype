@@ -6,15 +6,15 @@ read -p " > " build
 echo "[CONFIG]: Do you want to run the project right after building it? (y or n)(DEFAULT: y)"
 read -p " > " run
 
-echo "[INFO]: CREATING BUILD FOLDER..."
+echo "[INFO]: creating build folder..."
 mkdir -p ./build && cd ./build
 
 if [ "$build" = "y" ]; then
-    echo "[INFO]: GENERATING NINJA FILES..."
+    echo "[INFO]: generating ninja files..."
     cmake .. -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
 fi
 
-echo "[INFO]: BUILDING..."
+echo "[INFO]: building..."
 ninja
 
 cd ..

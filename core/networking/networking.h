@@ -17,8 +17,8 @@ namespace Networking
 	};
 	
 	typedef struct vec2_packet {
-		double x; double y;
-		uint8_t id;
+		double x;
+		double y;
 	} vec2_packet_t;
 	
 	typedef struct packet {

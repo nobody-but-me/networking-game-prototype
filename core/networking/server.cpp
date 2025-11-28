@@ -58,6 +58,7 @@ namespace Networking
 //					const packet_t *received_packet = reinterpret_cast<const packet_t*>(event.packet->data);
 //					if (received_packet == NULL)
 //						break;
+
 //					if (received_packet->type == Networking::packet_types::double_packet)
 //						Logging::INFO(LOG_PREFIX"double: %.1f", received_packet->double_value);
 					
