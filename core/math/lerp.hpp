@@ -5,8 +5,8 @@
 
 namespace Math {
 	
-	float lerp(float x, float y, float t);
-	float lerp_precise(float x, float y, float t);
+	float lerp(float a, float b, float t);
+	float lerp_precise(float a, float b, float t);
 	
 }
 

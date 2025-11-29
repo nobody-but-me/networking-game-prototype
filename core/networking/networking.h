@@ -17,8 +17,8 @@ namespace Networking
 	};
 	
 	typedef struct vec2_packet {
-		double x;
-		double y;
+		float x;
+		float y;
 	} vec2_packet_t;
 	
 	typedef struct packet {
@@ -26,7 +26,7 @@ namespace Networking
 	} packet_t;
 	
 	int send_string(const char *string);
-	int send_vec2(double x, double y);
+	int send_vec2(float x, float y);
 	int send_double(double value);
 	int send_int(int value);
 	

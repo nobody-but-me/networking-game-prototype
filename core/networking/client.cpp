@@ -18,13 +18,13 @@ namespace Networking
 	ENetPeer *cserver = NULL;
 	
 	int send_string(const char *string);
-	int send_vec2(double x, double y) {
+	int send_vec2(float x, float y) {
 		if (cserver == NULL)
 			return -1;
 		vec2_packet_t pkt;
 		pkt.x = x; pkt.y = y;
 		send_packet(cserver, &pkt, sizeof(pkt), false);
-		enet_host_flush(cclient);
+//		enet_host_flush(cclient); NOTE: should I flush it every time?
 		return 0;
 	}
 	int send_double(double value);
@@ -57,10 +57,10 @@ namespace Networking
 	
 	void client_loop(void (*connect_callback)(int id), void (*receive_callback)(void *data, int id), void (*disconnect_callback)(int id)) {
 		ENetEvent event = {};
-		if (enet_host_service(cclient, &event, 0) > 0 && event.type == ENET_EVENT_TYPE_CONNECT) {
+		if (enet_host_service(cclient, &event, 1) > 0 && event.type == ENET_EVENT_TYPE_CONNECT) {
 			Logging::INFO(LOG_PREFIX"Connect successfully.");
 			ENetEvent event;
-			if (enet_host_service(cclient, &event, 0) > 0) {
+			if (enet_host_service(cclient, &event, 1) > 0) {
 				switch (event.type) {
 					case ENET_EVENT_TYPE_NONE:
 						break;

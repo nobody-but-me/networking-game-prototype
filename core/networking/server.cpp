@@ -36,7 +36,7 @@ namespace Networking
 	
 	void server_loop(void (*connect_callback)(int id), void (*receive_callback)(void *data,int id), void (*disconnect_callback)(int id)) {
 		ENetEvent event = {};
-		if (enet_host_service(sserver, &event, 0) > 0) {
+		if (enet_host_service(sserver, &event, 1) > 0) {
 			switch (event.type) {
 				case ENET_EVENT_TYPE_CONNECT: {
 					Logging::INFO(LOG_PREFIX"New client connected from %d:%u.", event.peer->address.host, event.peer->address.port);
@@ -55,13 +55,6 @@ namespace Networking
 //																		event.packet->data, 
 //																		event.channelID
 //					);
-//					const packet_t *received_packet = reinterpret_cast<const packet_t*>(event.packet->data);
-//					if (received_packet == NULL)
-//						break;
-
-//					if (received_packet->type == Networking::packet_types::double_packet)
-//						Logging::INFO(LOG_PREFIX"double: %.1f", received_packet->double_value);
-					
 					if (receive_callback != NULL)
 						receive_callback(event.packet->data, event.peer->incomingPeerID);
 					enet_packet_destroy(event.packet);
