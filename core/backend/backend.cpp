@@ -35,10 +35,11 @@ namespace BackEnd
     void force_window_close( ) { GlfwIntegration::force_window_close(); }
     void destroy_application() {
 		Logging::INFO("backend.cpp::destroy_application() : Destroying application...");
-		if (SERVER == 0)
-			Networking::destroy_server();
-		else
-			Networking::destroy_client();
+//		if (SERVER == 1)
+//			Networking::destroy_server();
+//		else
+//			Networking::destroy_client();
+		Networking::destroy();
 		
 		Editor::destroy();
 		GlfwIntegration::destroy();
@@ -49,18 +50,12 @@ namespace BackEnd
     
     int init(const WindowMode& window_mode) {
 		if (GlfwIntegration::init(window_mode) == -1) return -1;
-		if (SERVER == 0) {
-			if (Networking::init_server() == 0)
-				Application::add_player();
-			else
-				return -1;
-		}
+		Networking::init(SERVER);
+		if (SERVER == 1)
+			Application::add_player();
 		else {
-			if (Networking::init_client() == 0) {
-				Application::add_player();
-				Application::add_puppet(1);
-			} else
-				return -1;
+			Application::add_player();
+			Application::add_puppet(1);
 		}
 		
 		ResourceManager::load_shader(&main_shader, "main_shader", SHADER_PATH"object.vert", SHADER_PATH"object.frag");
@@ -92,14 +87,30 @@ namespace BackEnd
 		const Networking::vec2_packet_t *pkt = reinterpret_cast<const Networking::vec2_packet_t*>(packet);
 		if (pkt == NULL)
 			return;
+		if (pkt->data.type != Networking::packet_types::vec2_packet)
+			return;
 		Application::update_puppet_position(glm::vec2(pkt->x, pkt->y));
 		return;
 	}
+	static void client_received_callback(void*packet,int id) {
+		const Networking::str_packet_t *pkt=reinterpret_cast<const Networking::str_packet_t*>(packet);
+		if (pkt==NULL) {
+			Logging::INFO("received client packet is null.");
+			return;
+		}
+		if (pkt->data.type!=Networking::packet_types::string_packet) {
+			Logging::INFO("packet is not a string");
+			return;
+		}
+		const char *str = pkt->string.c_str();
+		Logging::INFO("backend.cpp::client_received_callback(void*,int) : Server sent the follow message: '%s'", str);
+		return;
+	}
     void loop() {
-		if (SERVER == 0)
+		if (SERVER == 1)
 			Networking::server_loop(connected_callback, received_callback, NULL);
 		else
-			Networking::client_loop(NULL, NULL, NULL);
+			Networking::client_loop(NULL, client_received_callback, NULL);
 		
 		begin_frame();
 		if (InputManager::is_key_pressed(KEY_ESC)) force_window_close();

@@ -1,6 +1,7 @@
 
 #include <libs/molson.h>
 #include <iostream>
+#include <string>
 #include <vector>
 
 #include <backend/glfw_integration.hpp>
@@ -57,10 +58,10 @@ namespace Application {
 	double delay = 0;
 	void process(double delta) {
 		// NOTE: this is going to update the puppet poisition of the connected instance, not the current one
-		if (SERVER!=0) {
+		if (SERVER!=1) {
 			delay+=delta;
 			while (delay>=rate){
-				Networking::send_vec2(player.position.x,player.position.y);
+				Networking::send_vec2_to_server(player.position.x,player.position.y);
 				delay-=rate;
 			}
 		}

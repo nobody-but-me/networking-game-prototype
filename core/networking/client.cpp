@@ -17,18 +17,18 @@ namespace Networking
 	ENetHost *cclient = NULL;
 	ENetPeer *cserver = NULL;
 	
-	int send_string(const char *string);
-	int send_vec2(float x, float y) {
+	int send_string_to_server(std::string);
+	int send_vec2_to_server(float x, float y) {
 		if (cserver == NULL)
 			return -1;
 		vec2_packet_t pkt;
+		pkt.data.type = packet_types::vec2_packet;
+		
 		pkt.x = x; pkt.y = y;
 		send_packet(cserver, &pkt, sizeof(pkt), false);
 //		enet_host_flush(cclient); NOTE: should I flush it every time?
 		return 0;
 	}
-	int send_double(double value);
-	int send_int(int value);
 		
 	int init_client() {
 		ENetAddress address = {};
@@ -39,6 +39,7 @@ namespace Networking
 		cclient = enet_host_create(NULL, 1, CHANNELS, 0, 0);
 		if (cclient == NULL) {
 			Logging::ERROR(LOG_PREFIX"ENet client could not be created.");
+			enet_deinitialize();
 			return -1;
 		}
 		enet_address_set_host(&address, "localhost");
@@ -49,6 +50,7 @@ namespace Networking
 			Logging::ERROR(LOG_PREFIX"Failed to connect to server");
 			enet_peer_reset(cserver);
 			enet_host_destroy(cclient);
+			enet_deinitialize();
 			return -1;
 		}
 		Logging::INFO(LOG_PREFIX"Connected successfully");
@@ -57,31 +59,27 @@ namespace Networking
 	
 	void client_loop(void (*connect_callback)(int id), void (*receive_callback)(void *data, int id), void (*disconnect_callback)(int id)) {
 		ENetEvent event = {};
-		if (enet_host_service(cclient, &event, 1) > 0 && event.type == ENET_EVENT_TYPE_CONNECT) {
+		if (enet_host_service(cclient, &event, 0) > 0 && event.type == ENET_EVENT_TYPE_CONNECT) {
 			Logging::INFO(LOG_PREFIX"Connect successfully.");
 			ENetEvent event;
 			if (enet_host_service(cclient, &event, 1) > 0) {
 				switch (event.type) {
-					case ENET_EVENT_TYPE_NONE:
-						break;
 					case ENET_EVENT_TYPE_CONNECT:
 						if (connect_callback != NULL)
 							connect_callback(event.peer->incomingPeerID);
 						break;
 					case ENET_EVENT_TYPE_RECEIVE:
-						Logging::INFO(LOG_PREFIX"A packet of length %u containing '%s' have been received on channel %u.", 
-														event.packet->dataLength, 
-														event.packet->data, 
-														event.channelID
-						);
-						enet_packet_destroy(event.packet);
+						Logging::INFO("received.");
 						if (receive_callback != NULL)
 							receive_callback(event.peer->data, event.peer->incomingPeerID);
+//						enet_packet_destroy(event.packet);
 						break;
 					case ENET_EVENT_TYPE_DISCONNECT:
 						Logging::INFO(LOG_PREFIX"Server disconnected.");
 						if (disconnect_callback != NULL)
 							disconnect_callback(event.peer->incomingPeerID);
+						break;
+					case ENET_EVENT_TYPE_NONE:
 						break;
 				}
 			}
@@ -94,6 +92,7 @@ namespace Networking
 		
 		enet_peer_reset(cserver);
 		enet_host_destroy(cclient);
+		enet_deinitialize();
 		return;
 	}
 }
