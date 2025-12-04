@@ -1,6 +1,6 @@
 
 #include <iostream>
-#include <string>
+#include <cstring>
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
@@ -57,7 +57,6 @@ namespace BackEnd
 			Application::add_player();
 			Application::add_puppet(1);
 		}
-		
 		ResourceManager::load_shader(&main_shader, "main_shader", SHADER_PATH"object.vert", SHADER_PATH"object.frag");
 	
 		Gfx::Renderer::init();
@@ -93,17 +92,21 @@ namespace BackEnd
 		return;
 	}
 	static void client_received_callback(void*packet,int id) {
-		const Networking::str_packet_t *pkt=reinterpret_cast<const Networking::str_packet_t*>(packet);
+		const Networking::str_packet_t *pkt = reinterpret_cast<const Networking::str_packet_t*>(packet);
 		if (pkt==NULL) {
-			Logging::INFO("received client packet is null.");
+			Logging::ERROR("received client packet is null.");
 			return;
 		}
 		if (pkt->data.type!=Networking::packet_types::string_packet) {
-			Logging::INFO("packet is not a string");
+			Logging::ERROR("packet is not a string");
 			return;
 		}
-		const char *str = pkt->string.c_str();
-		Logging::INFO("backend.cpp::client_received_callback(void*,int) : Server sent the follow message: '%s'", str);
+		const char*str=reinterpret_cast<const char*>(pkt->string);
+		if(str==NULL){
+			Logging::ERROR("reinterpreted string is NULL.");
+			return;
+		}
+		Logging::INFO("backend.cpp::client_received_callback(void*,int) : Server sent the follow message: '%s'",str);
 		return;
 	}
     void loop() {

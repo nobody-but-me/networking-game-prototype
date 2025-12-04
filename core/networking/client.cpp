@@ -1,8 +1,6 @@
 
-
 #include <iostream>
 #include <cstring>
-#include <string>
 
 #include <networking/networking.h>
 #include <utils/log.hpp>
@@ -17,7 +15,7 @@ namespace Networking
 	ENetHost *cclient = NULL;
 	ENetPeer *cserver = NULL;
 	
-	int send_string_to_server(std::string);
+	int send_string_to_server(const char*string);
 	int send_vec2_to_server(float x, float y) {
 		if (cserver == NULL)
 			return -1;
@@ -58,29 +56,29 @@ namespace Networking
 	}
 	
 	void client_loop(void (*connect_callback)(int id), void (*receive_callback)(void *data, int id), void (*disconnect_callback)(int id)) {
-		ENetEvent event = {};
-		if (enet_host_service(cclient, &event, 0) > 0 && event.type == ENET_EVENT_TYPE_CONNECT) {
-			Logging::INFO(LOG_PREFIX"Connect successfully.");
-			ENetEvent event;
-			if (enet_host_service(cclient, &event, 1) > 0) {
-				switch (event.type) {
-					case ENET_EVENT_TYPE_CONNECT:
-						if (connect_callback != NULL)
-							connect_callback(event.peer->incomingPeerID);
-						break;
-					case ENET_EVENT_TYPE_RECEIVE:
-						Logging::INFO("received.");
-						if (receive_callback != NULL)
-							receive_callback(event.peer->data, event.peer->incomingPeerID);
-//						enet_packet_destroy(event.packet);
-						break;
-					case ENET_EVENT_TYPE_DISCONNECT:
-						Logging::INFO(LOG_PREFIX"Server disconnected.");
-						if (disconnect_callback != NULL)
-							disconnect_callback(event.peer->incomingPeerID);
-						break;
-					case ENET_EVENT_TYPE_NONE:
-						break;
+		ENetEvent event;
+		if (enet_host_service(cclient,&event,1)>0) {
+			switch(event.type) {
+				case ENET_EVENT_TYPE_CONNECT:{
+					if (connect_callback!=NULL)
+						connect_callback(event.peer->incomingPeerID);
+					break;
+				}
+				case ENET_EVENT_TYPE_RECEIVE:{
+					if (receive_callback != NULL)
+						receive_callback(event.packet->data, event.peer->incomingPeerID);
+					enet_packet_destroy(event.packet);
+					break;
+				}
+				case ENET_EVENT_TYPE_DISCONNECT:{
+					Logging::INFO(LOG_PREFIX"server disconnected.");
+					if (disconnect_callback!=NULL)
+						disconnect_callback(event.peer->incomingPeerID);
+					break;
+				}
+				case ENET_EVENT_TYPE_NONE:
+				default:{
+					break;
 				}
 			}
 		}

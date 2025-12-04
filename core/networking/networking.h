@@ -6,15 +6,11 @@
 #include <glm/vec2.hpp>
 #include <enet/enet.h>
 
-#include <string>
-
 namespace Networking
 {
 	enum packet_types: uint8_t
 	{
-		double_packet = 1,
-		integer_packet,
-		string_packet,
+		string_packet=1,
 		vec2_packet,
 	};
 	
@@ -27,14 +23,14 @@ namespace Networking
 		pkt_data_t data;
 	} vec2_packet_t;
 	typedef struct str_packet {
-		std::string string;
+		char string[256];
 		pkt_data_t data;
 	}  str_packet_t;
 	
-	int send_string_to_server(std::string string);
+	int send_string_to_server(const char*string);
 	int send_vec2_to_server(float x, float y);
 	
-	int send_string_to_client(std::string string);
+	int send_string_to_client(const char*string);
 	int send_vec2_to_client(float x, float y);
 	
 	constexpr size_t CHANNELS = 2;

@@ -20,6 +20,38 @@ namespace Networking
 	ENetHost *sserver = NULL;
 	ENetPeer *sclient = NULL;
 	
+	int send_string_to_client(const char*string){
+		if (sclient==NULL){
+			Logging::ERROR("server.cpp::send_string_to_client(const char*) : sclient is NULL");
+			return -1;
+		}
+		str_packet_t pkt;
+		if (strlen(string)>=256){
+			size_t new_length=strlen(string+1);
+			if((realloc(pkt.string,new_length))==NULL){
+				Logging::ERROR("server.cpp::send_string_to_client(const char*) : failed to allocate more memory to string array.");
+				return -1;
+			}
+		}
+		if ((strcpy(pkt.string,string))==NULL){
+			Logging::ERROR("server.cpp::send_string_to_client(const char*) : copied string for packet is NULL.");
+			return -1;
+		}
+		Logging::INFO("server.cpp::send_string_to_client(cosnt char*) : the follow string is being send to client : `%s`.",pkt.string);
+		pkt.data.type=packet_types::string_packet;
+		send_packet(sclient,&pkt,sizeof(pkt),false);
+		return 0;
+	}
+	int send_vec2_to_client(float x,float y) {
+		if (sclient==NULL)
+			return -1;
+		vec2_packet_t pkt;
+		pkt.data.type=packet_types::vec2_packet;
+		pkt.x=x;pkt.y=y;
+		send_packet(sclient,&pkt,sizeof(pkt),false);
+		return 0;
+	}
+	
 	int init_server() {
 		ENetAddress address = {};
 		if (enet_initialize() != 0) {
@@ -40,12 +72,11 @@ namespace Networking
 	}
 	
 	void server_loop(void (*connect_callback)(int id), void (*receive_callback)(void *data,int id), void (*disconnect_callback)(int id)) {
-		if (InputManager::is_key_pressed(KEY_W)) {
+		if (InputManager::is_key_pressed(KEY_ENTER)) {
 			if (sclient!=NULL) {
-				const char *message = "hello, client.";
-				ENetPacket *pkt = enet_packet_create(message, strlen(message) + 1, ENET_PACKET_FLAG_RELIABLE);
-				enet_peer_send(sclient, 0, pkt);
-				Logging::INFO("packet sent");
+				const char*message="hello, client";
+				send_string_to_client(message);
+				Logging::INFO("packet had been sent.");
 			}
 		}
 		ENetEvent event = {};
@@ -54,7 +85,7 @@ namespace Networking
 				case ENET_EVENT_TYPE_CONNECT: {
 					Logging::INFO(LOG_PREFIX"New client connected from %d:%u.", event.peer->address.host, event.peer->address.port);
 					sclient = event.peer;
-					if (sclient == NULL) {
+					if (sclient==NULL){
 						Logging::FATAL(LOG_PREFIX"could not assign variable to retrive connected client.");
 						break;
 					}
