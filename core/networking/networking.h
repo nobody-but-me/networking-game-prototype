@@ -3,6 +3,8 @@
 #ifndef NETWORKING_H
 #define NETWORKING_H
 
+#include <stdint.h>
+
 #include <glm/vec2.hpp>
 #include <enet/enet.h>
 
@@ -14,18 +16,24 @@ namespace Networking
 		vec2_packet,
 	};
 	
-	typedef struct pkt_data {
+	typedef struct packet {
+		union {
+			struct {
+// NOTE: is it the better way to do this?
+				uint32_t ux32;
+				uint32_t uy32;
+				int32_t i32;
+				float xf;
+				float yf;
+				
+				
+				char str[256];
+				int b;//boolean
+			} data;
+		} payload;
+		uint32_t size;
 		uint8_t type;
-	} pkt_data_t;
-	
-	typedef struct vec2_packet {
-		float x; float y;
-		pkt_data_t data;
-	} vec2_packet_t;
-	typedef struct str_packet {
-		char string[256];
-		pkt_data_t data;
-	}  str_packet_t;
+	} packet_t;
 	
 	int send_string_to_server(const char*string);
 	int send_vec2_to_server(float x, float y);
@@ -49,6 +57,7 @@ namespace Networking
 	int init_client(void);
 	
 	int init(int server);
+	void loop(void);
 	int destroy(void);
 }
 

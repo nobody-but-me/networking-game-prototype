@@ -12,7 +12,7 @@
 #include <common/enums.hpp> //temporary
 #include <utils/input.hpp>//temporary
 
-#define LOG_PREFIX "server.cpp::server() : "
+#define LOG_PREFIX "server.cpp::server() : "// im lazy
 
 namespace Networking
 {
@@ -21,34 +21,39 @@ namespace Networking
 	ENetPeer *sclient = NULL;
 	
 	int send_string_to_client(const char*string){
-		if (sclient==NULL){
+		if(sclient==NULL){
 			Logging::ERROR("server.cpp::send_string_to_client(const char*) : sclient is NULL");
 			return -1;
 		}
-		str_packet_t pkt;
-		if (strlen(string)>=256){
+		packet_t pkt;
+// allocates more memory in case pkt->string is not big enough for string;
+		if(strlen(string)>=256){
 			size_t new_length=strlen(string+1);
-			if((realloc(pkt.string,new_length))==NULL){
+			if((realloc(pkt.payload.data.str,new_length))==NULL){
 				Logging::ERROR("server.cpp::send_string_to_client(const char*) : failed to allocate more memory to string array.");
 				return -1;
 			}
 		}
-		if ((strcpy(pkt.string,string))==NULL){
+		if((strcpy(pkt.payload.data.str,string))==NULL){
 			Logging::ERROR("server.cpp::send_string_to_client(const char*) : copied string for packet is NULL.");
 			return -1;
 		}
-		Logging::INFO("server.cpp::send_string_to_client(cosnt char*) : the follow string is being send to client : `%s`.",pkt.string);
-		pkt.data.type=packet_types::string_packet;
-		send_packet(sclient,&pkt,sizeof(pkt),false);
+		Logging::INFO("server.cpp::send_string_to_client(cosnt char*) : the follow string is being send to client : `%s`.",
+			pkt.payload.data.str);
+		pkt.type=packet_types::string_packet;
+		pkt.size=sizeof(pkt);
+		send_packet(sclient,&pkt,pkt.size,false);
 		return 0;
 	}
 	int send_vec2_to_client(float x,float y) {
 		if (sclient==NULL)
 			return -1;
-		vec2_packet_t pkt;
-		pkt.data.type=packet_types::vec2_packet;
-		pkt.x=x;pkt.y=y;
-		send_packet(sclient,&pkt,sizeof(pkt),false);
+		packet_t pkt;
+		pkt.payload.data.xf=x;
+		pkt.payload.data.yf=y;
+		pkt.type=packet_types::vec2_packet;
+		pkt.size=sizeof(pkt);
+		send_packet(sclient,&pkt,pkt.size,false);
 		return 0;
 	}
 	

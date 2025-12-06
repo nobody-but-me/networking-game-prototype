@@ -1,9 +1,12 @@
 
-
 #include <iostream>
-
 #include <networking/networking.h>
+#include <utils/input.hpp>
+#include <utils/log.hpp>
 
+#include <glm/vec2.hpp>
+
+#include <application.hpp>
 
 namespace Networking
 {
@@ -18,9 +21,46 @@ namespace Networking
 		server == 1 ? Networking::init_server() : Networking::init_client();
 		return 0;
 	}
+	
+	static void connected_callback(int id){
+		if(IS_SERVER==1)
+			Application::add_puppet(id);
+		return;
+	}
+	static void received_callback(void*packet,int id){
+		Networking::packet_t*pkt=reinterpret_cast<Networking::packet_t*>(packet);
+		if(pkt==NULL){
+			Logging::ERROR("networking.cpp::received_callback(void*,int):reinterpret base packet  is NULL.");
+			return;
+		}
+		switch(pkt->type){
+			case Networking::packet_types::string_packet:{
+//				Logging::INFO("networking.cpp::received_callback(void*,int) : received string: '%s'",string_data->string);
+				break;
+			}
+			case Networking::packet_types::vec2_packet:{
+				float x=pkt->payload.data.xf;
+				float y=pkt->payload.data.yf;
+				glm::vec2 new_pos=glm::vec2(x,y);
+				Application::update_puppet_position(new_pos);
+				break;
+			}
+			default:{
+				break;
+			}
+		}
+		return;
+	}
+	
+	void loop(void){
+		IS_SERVER==1?Networking::server_loop(connected_callback,received_callback,NULL):
+			Networking::client_loop(NULL,received_callback,NULL);
+		return;
+	}
 	int destroy(void) {
 		IS_SERVER == 1 ? Networking::destroy_server() : Networking::destroy_client();
 		return 0;
 	}
 	
 }
+

@@ -19,11 +19,12 @@ namespace Networking
 	int send_vec2_to_server(float x, float y) {
 		if (cserver == NULL)
 			return -1;
-		vec2_packet_t pkt;
-		pkt.data.type = packet_types::vec2_packet;
-		
-		pkt.x = x; pkt.y = y;
-		send_packet(cserver, &pkt, sizeof(pkt), false);
+		packet_t pkt;
+		pkt.payload.data.xf=x;
+		pkt.payload.data.yf=y;
+		pkt.type=packet_types::vec2_packet;
+		pkt.size=sizeof(pkt);
+		send_packet(cserver, &pkt,pkt.size,false);
 //		enet_host_flush(cclient); NOTE: should I flush it every time?
 		return 0;
 	}

@@ -58,13 +58,14 @@ namespace Application {
 	double delay = 0;
 	void process(double delta) {
 		// NOTE: this is going to update the puppet poisition of the connected instance, not the current one
-		if (SERVER!=1) {
+//		if (SERVER!=1) {
 			delay+=delta;
 			while (delay>=rate){
-				Networking::send_vec2_to_server(player.position.x,player.position.y);
+				SERVER==1?Networking::send_vec2_to_client(player.position.x,player.position.y):
+					Networking::send_vec2_to_server(player.position.x,player.position.y);
 				delay-=rate;
 			}
-		}
+//		}
 		if (player.get_initialized() == true) {
 			if (InputManager::is_key_pressed(KEY_D))
 				player.position.x += speed * delta;

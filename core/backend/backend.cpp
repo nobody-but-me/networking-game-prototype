@@ -80,40 +80,42 @@ namespace BackEnd
 		Application::add_puppet(id);
 		return;
 	}
-	static void received_callback(void *packet, int id) {
+//	static void received_callback(void *packet, int id) {
 // TODO: reinterpreting directly to vec2_packet -- TEMPORARY; check type of packet before
 // and reinterpret it to type in question;
-		const Networking::vec2_packet_t *pkt = reinterpret_cast<const Networking::vec2_packet_t*>(packet);
-		if (pkt == NULL)
-			return;
-		if (pkt->data.type != Networking::packet_types::vec2_packet)
-			return;
-		Application::update_puppet_position(glm::vec2(pkt->x, pkt->y));
-		return;
-	}
-	static void client_received_callback(void*packet,int id) {
-		const Networking::str_packet_t *pkt = reinterpret_cast<const Networking::str_packet_t*>(packet);
-		if (pkt==NULL) {
-			Logging::ERROR("received client packet is null.");
-			return;
-		}
-		if (pkt->data.type!=Networking::packet_types::string_packet) {
-			Logging::ERROR("packet is not a string");
-			return;
-		}
-		const char*str=reinterpret_cast<const char*>(pkt->string);
-		if(str==NULL){
-			Logging::ERROR("reinterpreted string is NULL.");
-			return;
-		}
-		Logging::INFO("backend.cpp::client_received_callback(void*,int) : Server sent the follow message: '%s'",str);
-		return;
-	}
+//		const Networking::vec2_packet_t *pkt = reinterpret_cast<const Networking::vec2_packet_t*>(packet);
+//		if (pkt == NULL)
+//			return;
+//		if (pkt->data.type != Networking::packet_types::vec2_packet)
+//			return;
+//		Application::update_puppet_position(glm::vec2(pkt->x, pkt->y));
+//		return;
+//	}
+//	static void client_received_callback(void*packet,int id) {
+//		const Networking::str_packet_t *pkt = reinterpret_cast<const Networking::str_packet_t*>(packet);
+//		if (pkt==NULL) {
+//			Logging::ERROR("received client packet is null.");
+//			return;
+//		}
+//		if (pkt->data.type!=Networking::packet_types::string_packet) {
+//			Logging::ERROR("packet is not a string");
+//			return;
+//		}
+//		Logging::INFO("%s",pkt->string);
+//		const char*str=reinterpret_cast<const char*>(pkt->string);
+//		if(str==NULL){
+//			Logging::ERROR("reinterpreted string is NULL.");
+//			return;
+//		}
+//		Logging::INFO("backend.cpp::client_received_callback(void*,int) : Server sent the follow message: '%s'",str);
+//		return;
+//	}
     void loop() {
-		if (SERVER == 1)
-			Networking::server_loop(connected_callback, received_callback, NULL);
-		else
-			Networking::client_loop(NULL, client_received_callback, NULL);
+//		if (SERVER == 1)
+//			Networking::server_loop(connected_callback, received_callback, NULL);
+//		else
+//			Networking::client_loop(NULL, client_received_callback, NULL);
+		Networking::loop();
 		
 		begin_frame();
 		if (InputManager::is_key_pressed(KEY_ESC)) force_window_close();
