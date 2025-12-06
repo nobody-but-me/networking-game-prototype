@@ -54,28 +54,32 @@ namespace Application {
 		return;
 	}
 	
+	glm::vec2 last_pos=player.position;
+	
 	const double rate = 1.0f / 60.0f;
 	double delay = 0;
 	void process(double delta) {
 		// NOTE: this is going to update the puppet poisition of the connected instance, not the current one
-//		if (SERVER!=1) {
+		if(last_pos!=player.position){
 			delay+=delta;
 			while (delay>=rate){
 				SERVER==1?Networking::send_vec2_to_client(player.position.x,player.position.y):
 					Networking::send_vec2_to_server(player.position.x,player.position.y);
 				delay-=rate;
 			}
-//		}
+		}
 		if (player.get_initialized() == true) {
 			if (InputManager::is_key_pressed(KEY_D))
 				player.position.x += speed * delta;
-			if (InputManager::is_key_pressed(KEY_A))
+			else if (InputManager::is_key_pressed(KEY_A))
 				player.position.x -= speed * delta;
-			if (InputManager::is_key_pressed(KEY_S))
+			else if (InputManager::is_key_pressed(KEY_S))
 				player.position.y -= speed * delta;
-			if (InputManager::is_key_pressed(KEY_W))
+			else if (InputManager::is_key_pressed(KEY_W))
 				player.position.y += speed * delta;
-		}
+			else
+				last_pos=player.position;
+			}
 		return;
     }
     void ready(int _SERVER) {

@@ -59,22 +59,24 @@ namespace Networking
 	void client_loop(void (*connect_callback)(int id), void (*receive_callback)(void *data, int id), void (*disconnect_callback)(int id)) {
 		ENetEvent event;
 		if (enet_host_service(cclient,&event,1)>0) {
+			int peer_id=(int)(event.peer-cclient->peers);
 			switch(event.type) {
 				case ENET_EVENT_TYPE_CONNECT:{
 					if (connect_callback!=NULL)
-						connect_callback(event.peer->incomingPeerID);
+						connect_callback(peer_id);
 					break;
+					Logging::INFO("connect client id : %d", peer_id);
 				}
 				case ENET_EVENT_TYPE_RECEIVE:{
 					if (receive_callback != NULL)
-						receive_callback(event.packet->data, event.peer->incomingPeerID);
+						receive_callback(event.packet->data,peer_id);
 					enet_packet_destroy(event.packet);
 					break;
 				}
 				case ENET_EVENT_TYPE_DISCONNECT:{
 					Logging::INFO(LOG_PREFIX"server disconnected.");
 					if (disconnect_callback!=NULL)
-						disconnect_callback(event.peer->incomingPeerID);
+						disconnect_callback(peer_id);
 					break;
 				}
 				case ENET_EVENT_TYPE_NONE:

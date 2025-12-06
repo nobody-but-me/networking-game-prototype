@@ -42,7 +42,8 @@ namespace Networking
 			pkt.payload.data.str);
 		pkt.type=packet_types::string_packet;
 		pkt.size=sizeof(pkt);
-		send_packet(sclient,&pkt,pkt.size,false);
+//		send_packet(sclient,&pkt,pkt.size,false);
+		send_packet_all(sserver,&pkt,pkt.size,false);
 		return 0;
 	}
 	int send_vec2_to_client(float x,float y) {
@@ -53,7 +54,9 @@ namespace Networking
 		pkt.payload.data.yf=y;
 		pkt.type=packet_types::vec2_packet;
 		pkt.size=sizeof(pkt);
-		send_packet(sclient,&pkt,pkt.size,false);
+		
+//		send_packet(sclient,&pkt,pkt.size,false);
+		send_packet_all(sserver,&pkt,pkt.size,false);
 		return 0;
 	}
 	
@@ -86,6 +89,7 @@ namespace Networking
 		}
 		ENetEvent event = {};
 		if (enet_host_service(sserver, &event, 1) > 0) {
+			int peer_id=(int)((event.peer-sserver->peers)+1);
 			switch (event.type) {
 				case ENET_EVENT_TYPE_CONNECT: {
 					Logging::INFO(LOG_PREFIX"New client connected from %d:%u.", event.peer->address.host, event.peer->address.port);
@@ -95,12 +99,14 @@ namespace Networking
 						break;
 					}
 					if (connect_callback != NULL)
-						connect_callback(event.peer->incomingPeerID);
+						connect_callback(peer_id);
+					Logging::INFO("connect server id : %d", peer_id);
 					break;
 				}
 				case ENET_EVENT_TYPE_RECEIVE: {
+// event.peer->incomingPeerID;
 					if (receive_callback != NULL)
-						receive_callback(event.packet->data, event.peer->incomingPeerID);
+						receive_callback(event.packet->data,peer_id);
 					enet_packet_destroy(event.packet);
 					break;
 				}
@@ -108,7 +114,7 @@ namespace Networking
 					Logging::INFO(LOG_PREFIX"Client disconnected");
 					sclient = 0;
 					if (disconnect_callback != NULL)
-						disconnect_callback(event.peer->incomingPeerID);
+						disconnect_callback(peer_id);
 					break;
 				case ENET_EVENT_TYPE_NONE:
 				default:

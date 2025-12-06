@@ -19,20 +19,14 @@ namespace Networking
 	typedef struct packet {
 		union {
 			struct {
-// NOTE: is it the better way to do this?
-				uint32_t ux32;
-				uint32_t uy32;
-				int32_t i32;
+				char str[256];
 				float xf;
 				float yf;
-				
-				
-				char str[256];
-				int b;//boolean
 			} data;
 		} payload;
 		uint32_t size;
 		uint8_t type;
+		uint8_t id;
 	} packet_t;
 	
 	int send_string_to_server(const char*string);
@@ -44,6 +38,7 @@ namespace Networking
 	constexpr size_t CHANNELS = 2;
 	
 	void send_packet(ENetPeer *to, void *data, size_t packet_size, bool reliable);
+	void send_packet_all(ENetHost*to,void*data,size_t packet_size,bool reliable);
 	
 	void send_player_position_to_server(glm::vec2 new_player_position);
 	

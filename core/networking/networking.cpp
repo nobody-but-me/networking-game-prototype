@@ -39,10 +39,12 @@ namespace Networking
 				break;
 			}
 			case Networking::packet_types::vec2_packet:{
-				float x=pkt->payload.data.xf;
-				float y=pkt->payload.data.yf;
-				glm::vec2 new_pos=glm::vec2(x,y);
-				Application::update_puppet_position(new_pos);
+				if(id==0){
+					float x=pkt->payload.data.xf;
+					float y=pkt->payload.data.yf;
+					glm::vec2 new_pos=glm::vec2(x,y);
+					Application::update_puppet_position(new_pos);
+				}
 				break;
 			}
 			default:{
