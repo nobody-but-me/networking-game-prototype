@@ -30,14 +30,15 @@ namespace Networking
 		} payload;
 		uint32_t size;
 		uint8_t type;
+		uint8_t id;
 	} packet_t;
 	
-	int send_string_to_server(const char*string);
-	int send_vec2_to_server(float x, float y);
+	int send_string_to_server(const char*string,int id=0);
+	int send_vec2_to_server(float x, float y,int id=0);
 	
-	int send_string_to_client(const char*string,bool send_all);
-	int send_vec2_to_client(float x, float y,bool send_all);
-	int send_int_to_client(int value,bool send_all);
+	int send_string_to_client(const char*string,int id=0,bool send_all=false);
+	int send_vec2_to_client(float x, float y,int id=0,bool send_all=false);
+	int send_int_to_client(int value,int id=0,bool send_all=false);
 	
 	
 	constexpr size_t CHANNELS = 2;

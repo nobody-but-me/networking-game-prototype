@@ -30,8 +30,10 @@ namespace Networking
 	}
 	
 	static void connected_callback(int id){
-		if(IS_SERVER==1)
+		if(IS_SERVER==1){
 			Application::add_puppet(id);
+			Networking::send_int_to_client(id, false);
+		}
 		return;
 	}
 	static void received_callback(void*packet,int id){
@@ -40,17 +42,28 @@ namespace Networking
 			Logging::ERROR("networking.cpp::received_callback(void*,int):reinterpret base packet  is NULL.");
 			return;
 		}
+		uint8_t pkt_id=pkt->id;
 		switch(pkt->type){
 			case Networking::packet_types::string_packet:{
 //				Logging::INFO("networking.cpp::received_callback(void*,int) : received string: '%s'",string_data->string);
 				break;
 			}
 			case Networking::packet_types::vec2_packet:{
-				float x=pkt->payload.data.xf;
-				float y=pkt->payload.data.yf;
-				glm::vec2 new_pos=glm::vec2(x,y);
-				Application::update_puppet_position(new_pos);
+// NOTE: later, it'll iterate a list with every puppet in the scene to find the correct one;
+				if(pkt_id==Application::get_puppet_id()){
+					float x=pkt->payload.data.xf;
+					float y=pkt->payload.data.yf;
+					glm::vec2 new_pos=glm::vec2(x,y);
+					Application::update_puppet_position(new_pos);
+				}
 				break;
+			}
+			case Networking::packet_types::int_packet:{
+				if(IS_SERVER==0){
+					int value=pkt->payload.data.xi;
+					Application::add_player(value);
+					break;
+				}
 			}
 			default:{
 				break;

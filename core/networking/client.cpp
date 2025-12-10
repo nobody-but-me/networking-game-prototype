@@ -15,8 +15,8 @@ namespace Networking
 	ENetHost *cclient = NULL;
 	ENetPeer *cserver = NULL;
 	
-	int send_string_to_server(const char*string);
-	int send_vec2_to_server(float x, float y) {
+	int send_string_to_server(const char*string,int id);
+	int send_vec2_to_server(float x, float y,int id) {
 		if (cserver == NULL)
 			return -1;
 		packet_t pkt;
@@ -24,6 +24,7 @@ namespace Networking
 		pkt.payload.data.yf=y;
 		pkt.type=packet_types::vec2_packet;
 		pkt.size=sizeof(pkt);
+		pkt.id=static_cast<uint8_t>(id);
 		send_packet(cserver, &pkt,pkt.size,false);
 //		enet_host_flush(cclient); NOTE: should I flush it every time?
 		return 0;

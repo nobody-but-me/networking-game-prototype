@@ -8,6 +8,9 @@
 namespace Application
 {
     
+	int get_player_id(void);
+	int get_puppet_id(void);
+	
 	void add_player(int id);
 	void add_puppet(int id);
 	

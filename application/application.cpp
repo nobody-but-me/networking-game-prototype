@@ -25,6 +25,17 @@ namespace Application {
     
     float speed = 4.0f;
 	
+	int get_player_id(void){
+		if(player.get_initialized()==false)
+			return -1;
+		return player.get_id();
+	}
+	int get_puppet_id(void){
+		if(puppet.get_initialized()==false)
+			return -1;
+		return  puppet.get_id();
+	}
+	
 	void update_puppet_position(glm::vec2 new_position) {
 		puppet.position.x = Math::lerp(puppet.position.x, new_position.x, 0.3f);
 		puppet.position.y = Math::lerp(puppet.position.y, new_position.y, 0.3f);
@@ -66,13 +77,13 @@ namespace Application {
 			if(last_pos!=player.position){
 				delay+=delta;
 				while (delay>=rate){
-					SERVER==1?Networking::send_vec2_to_client(player.position.x,player.position.y,true):
-						Networking::send_vec2_to_server(player.position.x,player.position.y);
+					SERVER==1?Networking::send_vec2_to_client(player.position.x,player.position.y,player.get_id(),true):
+						Networking::send_vec2_to_server(player.position.x,player.position.y,player.get_id());
 					delay-=rate;
 				}
 			}
 
-// TODO: encapsulate this logic in a separte function;
+// TODO: encapsulate this logic in a separte function? Maybe;
 // updating player position;
 			if (InputManager::is_key_pressed(KEY_D))
 				player.position.x += speed * delta;

@@ -20,7 +20,7 @@ namespace Networking
 	ENetHost *sserver = NULL;
 	ENetPeer *sclient = NULL;
 	
-	int send_string_to_client(const char*string,bool send_all){
+	int send_string_to_client(const char*string,int id,bool send_all){
 		if(sclient==NULL){
 			Logging::ERROR("server.cpp::send_string_to_client(const char*) : sclient is NULL");
 			return -1;
@@ -42,10 +42,11 @@ namespace Networking
 			pkt.payload.data.str);
 		pkt.type=packet_types::string_packet;
 		pkt.size=sizeof(pkt);
+		pkt.id=static_cast<uint8_t>(id);
 		send_all==true?send_packet_all(sserver,&pkt,pkt.size,false):send_packet(sclient,&pkt,pkt.size,false);
 		return 0;
 	}
-	int send_vec2_to_client(float x,float y,bool send_all) {
+	int send_vec2_to_client(float x,float y,int id,bool send_all) {
 		if (sclient==NULL)
 			return -1;
 		packet_t pkt;
@@ -53,17 +54,18 @@ namespace Networking
 		pkt.payload.data.yf=y;
 		pkt.type=packet_types::vec2_packet;
 		pkt.size=sizeof(pkt);
-		
+		pkt.id=static_cast<uint8_t>(id);
 		send_all==true?send_packet_all(sserver,&pkt,pkt.size,false):send_packet(sclient,&pkt,pkt.size,false);
 		return 0;
 	}
-	int send_int_to_client(int value,bool send_all){
+	int send_int_to_client(int value,int id,bool send_all){
 		if(sclient==NULL)
 			return -1;
 		packet_t pkt;
 		pkt.payload.data.xi=value;
 		pkt.type=packet_types::int_packet;
 		pkt.size=sizeof(pkt);
+		pkt.id=static_cast<uint8_t>(id);
 		send_all==true?send_packet_all(sserver,&pkt,pkt.size,false):send_packet(sclient,&pkt,pkt.size,false);
 		return 0;
 	}
