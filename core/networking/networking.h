@@ -14,26 +14,31 @@ namespace Networking
 	{
 		string_packet=1,
 		vec2_packet,
+		int_packet,
 	};
 	
 	typedef struct packet {
 		union {
 			struct {
 				char str[256];
+				uint32_t u32;
 				float xf;
 				float yf;
+				int xi;
+				int yi;
 			} data;
 		} payload;
 		uint32_t size;
 		uint8_t type;
-		uint8_t id;
 	} packet_t;
 	
 	int send_string_to_server(const char*string);
 	int send_vec2_to_server(float x, float y);
 	
-	int send_string_to_client(const char*string);
-	int send_vec2_to_client(float x, float y);
+	int send_string_to_client(const char*string,bool send_all);
+	int send_vec2_to_client(float x, float y,bool send_all);
+	int send_int_to_client(int value,bool send_all);
+	
 	
 	constexpr size_t CHANNELS = 2;
 	
@@ -51,7 +56,9 @@ namespace Networking
 	int init_server(void);
 	int init_client(void);
 	
-	int init(int server);
+	int get_id(int is_server);
+	
+	int init(int is_server);
 	void loop(void);
 	int destroy(void);
 }

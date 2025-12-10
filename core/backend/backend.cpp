@@ -23,24 +23,19 @@
 #include <application.hpp>
 
 #define SHADER_PATH "../../core/res/shaders/"
-int SERVER = 0;
+int IS_SERVER = 0;
 
 namespace BackEnd
 {
     
     Shader main_shader;
  	
-	void set_server(int server) { SERVER = server; }
+	void set_server(int server) { IS_SERVER = server; }
 	
     void force_window_close( ) { GlfwIntegration::force_window_close(); }
     void destroy_application() {
 		Logging::INFO("backend.cpp::destroy_application() : Destroying application...");
-//		if (SERVER == 1)
-//			Networking::destroy_server();
-//		else
-//			Networking::destroy_client();
 		Networking::destroy();
-		
 		Editor::destroy();
 		GlfwIntegration::destroy();
 		return;
@@ -50,18 +45,19 @@ namespace BackEnd
     
     int init(const WindowMode& window_mode) {
 		if (GlfwIntegration::init(window_mode) == -1) return -1;
-		Networking::init(SERVER);
-		if (SERVER == 1)
-			Application::add_player();
-		else {
-			Application::add_player();
-			Application::add_puppet(1);
-		}
+		Networking::init(IS_SERVER);
+		// hardcoded
+//		if (IS_SERVER == 1)
+//			Application::add_player(0);
+//		else {
+//			Application::add_player();
+//			Application::add_puppet(1);
+//		}
 		ResourceManager::load_shader(&main_shader, "main_shader", SHADER_PATH"object.vert", SHADER_PATH"object.frag");
 	
 		Gfx::Renderer::init();
 		InputManager::init(GlfwIntegration::get_current_window());
-		Application::ready(SERVER);
+		Application::ready(IS_SERVER);
 		
 		Editor::init(GlfwIntegration::get_current_window());
 		Logging::INFO("backend.cpp::init() : backend initialized successfully.");
@@ -80,41 +76,8 @@ namespace BackEnd
 		Application::add_puppet(id);
 		return;
 	}
-//	static void received_callback(void *packet, int id) {
-// TODO: reinterpreting directly to vec2_packet -- TEMPORARY; check type of packet before
-// and reinterpret it to type in question;
-//		const Networking::vec2_packet_t *pkt = reinterpret_cast<const Networking::vec2_packet_t*>(packet);
-//		if (pkt == NULL)
-//			return;
-//		if (pkt->data.type != Networking::packet_types::vec2_packet)
-//			return;
-//		Application::update_puppet_position(glm::vec2(pkt->x, pkt->y));
-//		return;
-//	}
-//	static void client_received_callback(void*packet,int id) {
-//		const Networking::str_packet_t *pkt = reinterpret_cast<const Networking::str_packet_t*>(packet);
-//		if (pkt==NULL) {
-//			Logging::ERROR("received client packet is null.");
-//			return;
-//		}
-//		if (pkt->data.type!=Networking::packet_types::string_packet) {
-//			Logging::ERROR("packet is not a string");
-//			return;
-//		}
-//		Logging::INFO("%s",pkt->string);
-//		const char*str=reinterpret_cast<const char*>(pkt->string);
-//		if(str==NULL){
-//			Logging::ERROR("reinterpreted string is NULL.");
-//			return;
-//		}
-//		Logging::INFO("backend.cpp::client_received_callback(void*,int) : Server sent the follow message: '%s'",str);
-//		return;
-//	}
+	
     void loop() {
-//		if (SERVER == 1)
-//			Networking::server_loop(connected_callback, received_callback, NULL);
-//		else
-//			Networking::client_loop(NULL, client_received_callback, NULL);
 		Networking::loop();
 		
 		begin_frame();

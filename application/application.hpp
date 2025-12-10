@@ -8,8 +8,8 @@
 namespace Application
 {
     
+	void add_player(int id);
 	void add_puppet(int id);
-	void add_player();
 	
 	void update_puppet_position(glm::vec2 new_position);
 	void update_player_position(glm::vec2 new_position);

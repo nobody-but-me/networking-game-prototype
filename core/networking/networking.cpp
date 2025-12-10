@@ -16,9 +16,16 @@ namespace Networking
 		return IS_SERVER;
 	}
 	
-	int init(int server) {
-		IS_SERVER = server;
-		server == 1 ? Networking::init_server() : Networking::init_client();
+	int init(int is_server) {
+		IS_SERVER = is_server;
+		is_server == 1 ? Networking::init_server() : Networking::init_client();
+		
+// adding the server player if the current application is the server
+// adding the server puppet if the current application is the client
+		if(is_server==1)
+			Application::add_player(0);
+		else
+			Application::add_puppet(0);
 		return 0;
 	}
 	
@@ -39,12 +46,10 @@ namespace Networking
 				break;
 			}
 			case Networking::packet_types::vec2_packet:{
-				if(id==0){
-					float x=pkt->payload.data.xf;
-					float y=pkt->payload.data.yf;
-					glm::vec2 new_pos=glm::vec2(x,y);
-					Application::update_puppet_position(new_pos);
-				}
+				float x=pkt->payload.data.xf;
+				float y=pkt->payload.data.yf;
+				glm::vec2 new_pos=glm::vec2(x,y);
+				Application::update_puppet_position(new_pos);
 				break;
 			}
 			default:{

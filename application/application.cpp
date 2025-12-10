@@ -32,7 +32,7 @@ namespace Application {
 		return;
 	}
 	
-	void add_player() {
+	void add_player(int id) {
 		ResourceManager::init_rectangle(&player, "player", nullptr);
 		player.colour = glm::vec4(255.0f, 0.0f, 0.0f, 255.0f);
 		player.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -40,7 +40,7 @@ namespace Application {
 		player.scale = glm::vec2(2.0f, 2.0f);
 		player.z_index = 1;
 		
-		player.set_id(0);
+		player.set_id(id);
 	}
 	void add_puppet(int id) {
 		ResourceManager::init_rectangle(&puppet, "puppet", nullptr);
@@ -51,24 +51,29 @@ namespace Application {
 		puppet.z_index = 0;
 		
 		puppet.set_id(id);
+		Logging::INFO("puppet id : %d",id);
 		return;
 	}
 	
 	glm::vec2 last_pos=player.position;
 	
-	const double rate = 1.0f / 60.0f;
-	double delay = 0;
+	const double rate=1.0f/60.0f; // r-(h)ate;
+	double delay=0;
 	void process(double delta) {
-		// NOTE: this is going to update the puppet poisition of the connected instance, not the current one
-		if(last_pos!=player.position){
-			delay+=delta;
-			while (delay>=rate){
-				SERVER==1?Networking::send_vec2_to_client(player.position.x,player.position.y):
-					Networking::send_vec2_to_server(player.position.x,player.position.y);
-				delay-=rate;
+		
+// updating player position to the server or to the client at a fixed framerate;
+		if (player.get_initialized()==true){
+			if(last_pos!=player.position){
+				delay+=delta;
+				while (delay>=rate){
+					SERVER==1?Networking::send_vec2_to_client(player.position.x,player.position.y,true):
+						Networking::send_vec2_to_server(player.position.x,player.position.y);
+					delay-=rate;
+				}
 			}
-		}
-		if (player.get_initialized() == true) {
+
+// TODO: encapsulate this logic in a separte function;
+// updating player position;
 			if (InputManager::is_key_pressed(KEY_D))
 				player.position.x += speed * delta;
 			else if (InputManager::is_key_pressed(KEY_A))
