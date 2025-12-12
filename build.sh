@@ -11,7 +11,9 @@ mkdir -p ./build && cd ./build
 
 if [ "$build" = "y" ]; then
     echo "[INFO]: generating ninja files..."
-    cmake .. -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+    cmake .. -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+			-DGLFW_LIB=/usr/local/lib64/libglfw3.a							\
+			-DENET_LIB=/usr/local/lib/libenet.a								
 fi
 
 echo "[INFO]: building..."

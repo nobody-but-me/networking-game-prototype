@@ -33,13 +33,12 @@ namespace Networking
 		uint8_t id;
 	} packet_t;
 	
-	int send_string_to_server(const char*string,int id=0);
-	int send_vec2_to_server(float x, float y,int id=0);
+	int send_string_to_server(const char*string,uint8_t id=0);
+	int send_vec2_to_server(float x, float y,uint8_t id=0);
 	
-	int send_string_to_client(const char*string,int id=0,bool send_all=false);
-	int send_vec2_to_client(float x, float y,int id=0,bool send_all=false);
-	int send_int_to_client(int value,int id=0,bool send_all=false);
-	
+	int send_string_to_client(const char*string,uint8_t id=0,bool send_all=false);
+	int send_vec2_to_client(float x, float y,uint8_t id=0,bool send_all=false);
+	int send_int_to_client(int value,uint8_t id=0,bool send_all=false);
 	
 	constexpr size_t CHANNELS = 2;
 	

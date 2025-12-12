@@ -2,6 +2,9 @@
 cmake_minimum_required(VERSION 3.21)
 project(PROTOTYPE CXX C)
 
+set(GLFW_LIB "" CACHE STRING "path to glfw statically linked library")
+set(ENET_LIB "" CACHE STRING "path to enet statically linked library")
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 add_executable(prototype)
 
@@ -35,6 +38,11 @@ if (UNIX)
     
     target_link_libraries(prototype PRIVATE ${CMAKE_THREAD_LIBS_INIT} ${X11_LIBRARIES} ${CMAKE_DL_LIBS})
 endif()
+if (!GLFW_LIB)
+	message(FATAL_ERROR "statically linked GLFW library could not be found")
+elif (!ENET_LIB)
+	message(FATAL_ERROR "statically linked ENET library could not be found")
+endif()
 
 find_package(OpenGL REQUIRED)
 
@@ -43,7 +51,8 @@ target_sources(prototype PRIVATE
 	${SRC_FILES} 
 	${CMAKE_SOURCE_DIR}/core/libs/glad.c
 )
-target_link_libraries(prototype PRIVATE ${OPENGL_gl_LIBRARY} glfw enet)
+target_compile_options(prototype PRIVATE -Wall -Werror -Wno-unknown-pragmas -Wno-unused-function)
+target_link_options(prototype PUBLIC -fPIE -fPIC)
 
-target_compile_options(prototype PRIVATE -Wall -Werror -Wno-unused-result -Wno-unknown-pragmas -Wno-unused-function)
+target_link_libraries(prototype PRIVATE ${OPENGL_gl_LIBRARY} ${GLFW_LIB} ${ENET_LIB})
 

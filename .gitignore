@@ -5,3 +5,6 @@
 
 # [CHARLIE]
 *.backup
+
+# [STATIC_LIBS]
+*.a

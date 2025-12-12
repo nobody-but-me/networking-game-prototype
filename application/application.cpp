@@ -20,7 +20,8 @@ namespace Application {
     
 	int SERVER = 0;
 	
-	Object player, puppet;
+	std::vector<Object> puppets;
+	Object player;//, puppet;
 	int player_id;
     
     float speed = 4.0f;
@@ -30,20 +31,22 @@ namespace Application {
 			return -1;
 		return player.get_id();
 	}
-	int get_puppet_id(void){
-		if(puppet.get_initialized()==false)
-			return -1;
-		return  puppet.get_id();
+	int get_puppet_id(uint8_t puppet_id){
+		
+//		if(puppet.get_initialized()==false)
+//			return -1;
+//		return  puppet.get_id();
+		return -1;
 	}
 	
-	void update_puppet_position(glm::vec2 new_position) {
-		puppet.position.x = Math::lerp(puppet.position.x, new_position.x, 0.3f);
-		puppet.position.y = Math::lerp(puppet.position.y, new_position.y, 0.3f);
+	void update_puppet_position(Object*puppet,glm::vec2 new_position) {
+		puppet->position.x=Math::lerp(puppet->position.x,new_position.x,0.3f);
+		puppet->position.y=Math::lerp(puppet->position.y,new_position.y,0.3f);
 //		puppet.position = new_position;
 		return;
 	}
 	
-	void add_player(int id) {
+	void add_player(uint8_t player_id) {
 		ResourceManager::init_rectangle(&player, "player", nullptr);
 		player.colour = glm::vec4(255.0f, 0.0f, 0.0f, 255.0f);
 		player.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -51,19 +54,35 @@ namespace Application {
 		player.scale = glm::vec2(2.0f, 2.0f);
 		player.z_index = 1;
 		
-		player.set_id(id);
+		player.set_id(static_cast<uint8_t>(player_id));
 	}
-	void add_puppet(int id) {
-		ResourceManager::init_rectangle(&puppet, "puppet", nullptr);
-		puppet.colour = glm::vec4(0.0f, 0.0f, 255.0f, 255.0f);
-		puppet.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
-		puppet.position = glm::vec2(0.0f, 0.0f);
-		puppet.scale = glm::vec2(2.0f, 2.0f);
-		puppet.z_index = 0;
+	void add_puppet(uint8_t puppet_id) {
+		Object new_puppet;
+		std::string name_id=std::to_string(puppet_id);
+		std::string base_name="puppet";
+		std::string final_name=base_name+name_id; // it looks even false, like it should not be that easy;
 		
-		puppet.set_id(id);
-		Logging::INFO("puppet id : %d",id);
+		Logging::INFO("%s",final_name.c_str());
+		
+//		ResourceManager::init_rectangle(&new_puppet,final_name,nullptr);
+//		new_puppet.colour=glm::vec4(0.0f,0.0f,255.0f,255.0f);
+//		new_puppet.rotation=glm::vec3(0.0f,0.0f,0.0f);
+//		new_puppet.scale=glm::vec2(2.0f,2.0f);
+//		new_puppet.z_index=0;
+
+//		new_puppet.set_id(static_cast<int>(puppet_id));
+//		puppets.emplace_back(new_puppet);
 		return;
+//		ResourceManager::init_rectangle(&puppet, "puppet", nullptr);
+//		puppet.colour = glm::vec4(0.0f, 0.0f, 255.0f, 255.0f);
+//		puppet.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+//		puppet.position = glm::vec2(0.0f, 0.0f);
+//		puppet.scale = glm::vec2(2.0f, 2.0f);
+//		puppet.z_index = 0;
+		
+//		puppet.set_id(id);
+//		Logging::INFO("puppet id : %d",id);
+//		return;
 	}
 	
 	glm::vec2 last_pos=player.position;

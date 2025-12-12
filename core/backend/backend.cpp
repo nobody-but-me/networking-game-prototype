@@ -46,13 +46,6 @@ namespace BackEnd
     int init(const WindowMode& window_mode) {
 		if (GlfwIntegration::init(window_mode) == -1) return -1;
 		Networking::init(IS_SERVER);
-		// hardcoded
-//		if (IS_SERVER == 1)
-//			Application::add_player(0);
-//		else {
-//			Application::add_player();
-//			Application::add_puppet(1);
-//		}
 		ResourceManager::load_shader(&main_shader, "main_shader", SHADER_PATH"object.vert", SHADER_PATH"object.frag");
 	
 		Gfx::Renderer::init();
