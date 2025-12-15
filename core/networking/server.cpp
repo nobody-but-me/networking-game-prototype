@@ -99,7 +99,7 @@ namespace Networking
 		}
 		ENetEvent event = {};
 		if (enet_host_service(sserver, &event, 1) > 0) {
-			int peer_id=(int)((event.peer-sserver->peers)+1);
+            int peer_id=(int)(event.peer-sserver->peers);
 			switch (event.type) {
 				case ENET_EVENT_TYPE_CONNECT: {
 					Logging::INFO(LOG_PREFIX"New client connected from %d:%u.", event.peer->address.host, event.peer->address.port);

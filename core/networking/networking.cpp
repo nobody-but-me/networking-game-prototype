@@ -1,4 +1,5 @@
 
+
 #include <iostream>
 #include <string>
 
@@ -34,8 +35,8 @@ namespace Networking
 	
 	static void connected_callback(int id){
 		if(IS_SERVER==1){
-			Application::add_puppet(id);
 			Networking::send_int_to_client(id, false);
+			Application::add_puppet(id);
 		}
 		return;
 	}
@@ -45,7 +46,7 @@ namespace Networking
 			Logging::ERROR("networking.cpp::received_callback(void*,int):reinterpret base packet  is NULL.");
 			return;
 		}
-		uint8_t pkt_id=pkt->id+1;
+		uint8_t pkt_id=pkt->id;
 		switch(pkt->type){
 			case Networking::packet_types::string_packet:{
 //				Logging::INFO("networking.cpp::received_callback(void*,int) : received string: '%s'",string_data->string);
@@ -57,9 +58,7 @@ namespace Networking
 				std::string str_id=std::to_string(pkt_id);
 				std::string puppet_name=base_name+str_id;
 				
-//				Logging::INFO("name:%s",puppet_name.c_str());
-				
-				Object*puppet=ResourceManager::get_object(puppet_name);
+				Object*puppet=ResourceManager::get_object(puppet_name.c_str());
 				if(puppet==NULL)
 					break;
 				float x=pkt->payload.data.xf;

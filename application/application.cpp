@@ -1,8 +1,11 @@
 
-#include <libs/molson.h>
+#include <algorithm>
 #include <iostream>
+#include <cstring>
 #include <string>
 #include <vector>
+
+#include <libs/molson.h>
 
 #include <backend/glfw_integration.hpp>
 #include <utils/resource_manager.hpp>
@@ -57,32 +60,24 @@ namespace Application {
 		player.set_id(static_cast<uint8_t>(player_id));
 	}
 	void add_puppet(uint8_t puppet_id) {
-		Object new_puppet;
 		std::string name_id=std::to_string(puppet_id);
 		std::string base_name="puppet";
 		std::string final_name=base_name+name_id; // it looks even false, like it should not be that easy;
+		Logging::INFO("new puppet name: %s.",final_name.c_str());
 		
-		Logging::INFO("%s",final_name.c_str());
+		Object new_puppet;
+		puppets.emplace_back(new_puppet);
+		int idx=(puppets.size()-1);
 		
-//		ResourceManager::init_rectangle(&new_puppet,final_name,nullptr);
-//		new_puppet.colour=glm::vec4(0.0f,0.0f,255.0f,255.0f);
-//		new_puppet.rotation=glm::vec3(0.0f,0.0f,0.0f);
-//		new_puppet.scale=glm::vec2(2.0f,2.0f);
-//		new_puppet.z_index=0;
-
-//		new_puppet.set_id(static_cast<int>(puppet_id));
-//		puppets.emplace_back(new_puppet);
+		ResourceManager::init_rectangle(&puppets[idx],final_name.c_str(),nullptr);
+		puppets[idx].colour=glm::vec4(0.0f,0.0f,255.0f,255.0f);
+		puppets[idx].rotation=glm::vec3(0.0f,0.0f,0.0f);
+		puppets[idx].position=glm::vec2(0.0f,0.0f);
+		puppets[idx].scale=glm::vec2(2.0f,2.0f);
+		puppets[idx].z_index=0;
+		
+		puppets[idx].set_id(static_cast<int>(puppet_id));
 		return;
-//		ResourceManager::init_rectangle(&puppet, "puppet", nullptr);
-//		puppet.colour = glm::vec4(0.0f, 0.0f, 255.0f, 255.0f);
-//		puppet.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
-//		puppet.position = glm::vec2(0.0f, 0.0f);
-//		puppet.scale = glm::vec2(2.0f, 2.0f);
-//		puppet.z_index = 0;
-		
-//		puppet.set_id(id);
-//		Logging::INFO("puppet id : %d",id);
-//		return;
 	}
 	
 	glm::vec2 last_pos=player.position;
