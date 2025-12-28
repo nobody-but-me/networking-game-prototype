@@ -1,5 +1,4 @@
 
-
 #include <iostream>
 #include <string>
 
@@ -35,8 +34,9 @@ namespace Networking
 	
 	static void connected_callback(int id){
 		if(IS_SERVER==1){
-			Networking::send_int_to_client(id, false);
-			Application::add_puppet(id);
+// it'll become useless pretty quick
+			Networking::send_int_to_client(id+1,true);
+			Application::add_puppet(id+1);
 		}
 		return;
 	}
@@ -54,15 +54,15 @@ namespace Networking
 			}
 			case Networking::packet_types::vec2_packet:{
 // NOTE: later, it'll iterate a list with every puppet in the scene to find the correct one;
-				std::string base_name="puppet";
-				std::string str_id=std::to_string(pkt_id);
-				std::string puppet_name=base_name+str_id;
+//				std::string base_name="puppet";
+//				std::string str_id=std::to_string(pkt_id);
+//				std::string puppet_name=base_name+str_id;
+				std::string puppet_name=std::to_string(pkt_id);
 				
-				Object*puppet=ResourceManager::get_object(puppet_name.c_str());
+				Object*puppet=ResourceManager::get_object(puppet_name);
 				if(puppet==NULL)
 					break;
-				float x=pkt->payload.data.xf;
-				float y=pkt->payload.data.yf;
+				float x=pkt->payload.data.xf;float y=pkt->payload.data.yf;
 				glm::vec2 new_pos=glm::vec2(x,y);
 				Application::update_puppet_position(puppet,new_pos);
 				break;
@@ -71,8 +71,8 @@ namespace Networking
 				if(IS_SERVER==0){
 					uint8_t value=pkt->payload.data.xi;
 					Application::add_player(value);
-					break;
 				}
+				break;
 			}
 			default:{
 				break;

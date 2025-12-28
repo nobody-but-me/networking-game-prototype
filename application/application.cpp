@@ -35,7 +35,6 @@ namespace Application {
 		return player.get_id();
 	}
 	int get_puppet_id(uint8_t puppet_id){
-		
 //		if(puppet.get_initialized()==false)
 //			return -1;
 //		return  puppet.get_id();
@@ -50,26 +49,29 @@ namespace Application {
 	}
 	
 	void add_player(uint8_t player_id) {
-		ResourceManager::init_rectangle(&player, "player", nullptr);
+		std::string name=std::to_string(player_id);
+		ResourceManager::init_rectangle(&player,name,nullptr);
 		player.colour = glm::vec4(255.0f, 0.0f, 0.0f, 255.0f);
 		player.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 		player.position = glm::vec2(0.0f, 0.0f);
 		player.scale = glm::vec2(2.0f, 2.0f);
 		player.z_index = 1;
 		
-		player.set_id(static_cast<uint8_t>(player_id));
+		player.set_id(static_cast<int>(player_id));
+//		Logging::INFO("player_id: %d",static_cast<int>(player_id));
+		return;
 	}
 	void add_puppet(uint8_t puppet_id) {
-		std::string name_id=std::to_string(puppet_id);
-		std::string base_name="puppet";
-		std::string final_name=base_name+name_id; // it looks even false, like it should not be that easy;
-		Logging::INFO("new puppet name: %s.",final_name.c_str());
+//		std::string name_id=std::to_string(puppet_id);
+//		std::string base_name="puppet";
+//		std::string final_name=base_name+name_id; // it looks even false, like it should not be that easy;
+		std::string puppet_name=std::to_string(puppet_id);
 		
 		Object new_puppet;
 		puppets.emplace_back(new_puppet);
 		int idx=(puppets.size()-1);
 		
-		ResourceManager::init_rectangle(&puppets[idx],final_name.c_str(),nullptr);
+		ResourceManager::init_rectangle(&puppets[idx],puppet_name,nullptr);
 		puppets[idx].colour=glm::vec4(0.0f,0.0f,255.0f,255.0f);
 		puppets[idx].rotation=glm::vec3(0.0f,0.0f,0.0f);
 		puppets[idx].position=glm::vec2(0.0f,0.0f);
@@ -77,15 +79,15 @@ namespace Application {
 		puppets[idx].z_index=0;
 		
 		puppets[idx].set_id(static_cast<int>(puppet_id));
+		Logging::INFO("puppet_id: %d",static_cast<int>(puppet_id));
 		return;
 	}
 	
 	glm::vec2 last_pos=player.position;
 	
-	const double rate=1.0f/60.0f; // r-(h)ate;
+	const double rate=1.0f/24.0f; // r-(h)ate;
 	double delay=0;
-	void process(double delta) {
-		
+	void process(double delta) {	
 // updating player position to the server or to the client at a fixed framerate;
 		if (player.get_initialized()==true){
 			if(last_pos!=player.position){
@@ -109,7 +111,7 @@ namespace Application {
 				player.position.y += speed * delta;
 			else
 				last_pos=player.position;
-			}
+		}
 		return;
     }
     void ready(int _SERVER) {
